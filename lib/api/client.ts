@@ -28,9 +28,10 @@ export async function api<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const token = getToken()
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData
   const headers: HeadersInit = {
     Accept: "application/json",
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers ?? {}),
   }
 

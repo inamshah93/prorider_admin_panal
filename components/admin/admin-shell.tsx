@@ -27,14 +27,14 @@ const NAV = [
   { href: "/orders", label: "Orders", desc: "Lifecycle & assign", icon: Package },
   { href: "/finance", label: "Finance", desc: "Payments & overrides", icon: Wallet },
   { href: "/management", label: "Management", desc: "Roles & access", icon: Users },
-  { href: "/settings/cities", label: "Settings", desc: "Cities & aliases", icon: Settings },
+  { href: "/settings/cities", label: "Settings", desc: "Cities & pricing", icon: Settings },
 ]
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const auth = useRequireAuth()
   const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const current = NAV.find((n) => pathname.startsWith(n.href)) ?? NAV[0]
+  const current = NAV.find((n) => pathname.startsWith(n.href)) ?? (pathname.startsWith("/riders/") ? NAV.find((n) => n.href === "/riders") : NAV[0])
   const initials = auth.user?.name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() ?? "AO"
 
   if (auth.loading) {
