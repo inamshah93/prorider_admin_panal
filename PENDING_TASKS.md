@@ -26,12 +26,13 @@ Last updated: 2026-07-02
 
 | # | Task | App | Status |
 |---|------|-----|--------|
-| 2.1 | Live map + rider pin on track | Customer | Pending |
-| 2.2 | ETA on tracking | Backend + Customer | Pending |
-| 2.3 | Phone verify on public track | Customer + Backend | Pending |
-| 2.4 | Rider navigate to address | Rider | Pending |
+| 2.1 | Live map + rider pin on track | Customer | Done |
+| 2.2 | ETA on tracking | Backend + Customer | Done |
+| 2.3 | Phone verify on public track | Customer + Backend | Done |
+| 2.4 | Rider navigate to address | Rider | Done |
 | 2.5 | Admin live rider map | Admin | Pending |
-| 2.6 | Status push notifications | All apps | Pending |
+| 2.6 | Status push notifications | Backend | Partial (assign/pickup/deliver FCM) |
+| 2.7 | Firebase config in mobile apps | All apps | Pending |
 
 ---
 
