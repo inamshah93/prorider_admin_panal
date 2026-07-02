@@ -8,6 +8,7 @@ import {
   Store,
   Bike,
   Users,
+  UserCircle,
   Settings,
   Truck,
   Bell,
@@ -24,6 +25,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", desc: "Real-time operations", icon: LayoutDashboard },
   { href: "/vendors", label: "Vendors", desc: "Stores & ledgers", icon: Store },
   { href: "/riders", label: "Riders", desc: "Fleet & cash", icon: Bike },
+  { href: "/customers", label: "Customers", desc: "App users & orders", icon: UserCircle },
   { href: "/orders", label: "Orders", desc: "Lifecycle & assign", icon: Package },
   { href: "/finance", label: "Finance", desc: "Payments & overrides", icon: Wallet },
   { href: "/management", label: "Management", desc: "Roles & access", icon: Users },
@@ -34,7 +36,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const auth = useRequireAuth()
   const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const current = NAV.find((n) => pathname.startsWith(n.href)) ?? (pathname.startsWith("/riders/") ? NAV.find((n) => n.href === "/riders") : NAV[0])
+  const current =
+    NAV.find((n) => pathname.startsWith(n.href)) ??
+    (pathname.startsWith("/riders/") ? NAV.find((n) => n.href === "/riders") : null) ??
+    (pathname.startsWith("/orders/") ? NAV.find((n) => n.href === "/orders") : null) ??
+    NAV[0]
   const initials = auth.user?.name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() ?? "AO"
 
   if (auth.loading) {

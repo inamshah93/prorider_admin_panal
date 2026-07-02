@@ -20,7 +20,7 @@ import {
 type AuthContextValue = {
   user: AuthUser | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (phone: string, password: string) => Promise<void>
   logout: () => Promise<void>
   hasPermission: (perm: string) => boolean
 }
@@ -40,8 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const login = useCallback(
-    async (email: string, password: string) => {
-      const u = await apiLogin(email, password)
+    async (phone: string, password: string) => {
+      const u = await apiLogin(phone, password)
       setUser(u)
       router.push("/dashboard")
     },

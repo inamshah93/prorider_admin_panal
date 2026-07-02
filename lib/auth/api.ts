@@ -8,10 +8,10 @@ export type AuthUser = {
   permissions: string[]
 }
 
-export async function login(email: string, password: string) {
+export async function login(phone: string, password: string) {
   const res = await api<{ token: string; user: AuthUser }>("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ phone, password }),
   })
   setToken(res.token)
   return res.user

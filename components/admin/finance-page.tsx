@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import Link from "next/link"
 import { useState } from "react"
 import { api } from "@/lib/api/client"
 
@@ -50,7 +51,9 @@ export function FinancePage() {
           <ul className="mt-4 space-y-2 text-sm">
             {pending.map((o) => (
               <li key={o.id} className="flex justify-between rounded-xl border border-border px-3 py-2">
-                <span className="font-mono">{o.order_reference_number}</span>
+                <Link href={`/orders/${o.id}`} className="font-mono text-primary hover:underline">
+                  {o.order_reference_number}
+                </Link>
                 <span>₨ {Number(o.cod_amount).toLocaleString("en-PK")}</span>
               </li>
             ))}

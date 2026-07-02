@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth/auth-context"
 
 export default function LoginPage() {
   const { login } = useAuth()
-  const [email, setEmail] = useState("admin@velo.pk")
+  const [phone, setPhone] = useState("03001234567")
   const [password, setPassword] = useState("password")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -16,9 +16,9 @@ export default function LoginPage() {
     setError("")
     setLoading(true)
     try {
-      await login(email, password)
+      await login(phone, password)
     } catch {
-      setError("Invalid credentials. Try admin@velo.pk / password")
+      setError("Invalid credentials. Try 03001234567 / password")
     } finally {
       setLoading(false)
     }
@@ -38,11 +38,12 @@ export default function LoginPage() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">Email</label>
+            <label className="mb-1 block text-sm font-medium">Phone number</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="03001234567"
               className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
               required
             />

@@ -1,23 +1,14 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/lib/api/client"
+import Link from "next/link"
+import { adminApi } from "@/lib/api/admin"
 import { StatusBadge } from "@/components/shared/status-badge"
-
-type Order = {
-  id: number
-  order_reference_number: string
-  customer_name: string
-  order_status: string
-  payment_status: string
-  cod_amount: string
-  target_city?: string
-}
 
 export function OrdersPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-orders"],
-    queryFn: () => api<{ data: Order[] }>("/admin/orders"),
+    queryFn: () => adminApi.orders(),
   })
 
   const orders = data?.data ?? []
@@ -40,7 +31,11 @@ export function OrdersPage() {
           <tbody>
             {orders.map((o) => (
               <tr key={o.id} className="border-b border-border/60">
-                <td className="px-4 py-3 font-mono">{o.order_reference_number}</td>
+                <td className="px-4 py-3 font-mono">
+                  <Link href={`/orders/${o.id}`} className="text-primary hover:underline">
+                    {o.order_reference_number}
+                  </Link>
+                </td>
                 <td className="px-4 py-3">{o.customer_name}</td>
                 <td className="px-4 py-3">{o.target_city ?? "—"}</td>
                 <td className="px-4 py-3">₨ {Number(o.cod_amount).toLocaleString("en-PK")}</td>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
 import { Bike, PackageOpen, Banknote, ShieldCheck } from "lucide-react"
 import { api } from "@/lib/api/client"
 import { StatusBadge } from "@/components/shared/status-badge"
@@ -77,7 +78,9 @@ export function DashboardOverview() {
           <ul className="mt-4 space-y-3">
             {data.recent_activity.map((order) => (
               <li key={order.id} className="flex items-center justify-between text-sm">
-                <span className="font-mono">{order.order_reference_number}</span>
+                <Link href={`/orders/${order.id}`} className="font-mono text-primary hover:underline">
+                  {order.order_reference_number}
+                </Link>
                 <StatusBadge status={order.order_status.replace(/_/g, " ") as never} />
               </li>
             ))}

@@ -8,6 +8,13 @@ import { adminApi } from "@/lib/api/admin"
 export function Vendors() {
   const qc = useQueryClient()
   const [query, setQuery] = useState("")
+  const [showCreate, setShowCreate] = useState(false)
+  const [storeName, setStoreName] = useState("")
+  const [contactName, setContactName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [password, setPassword] = useState("")
+  const [createError, setCreateError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editCharge, setEditCharge] = useState("")
 
@@ -25,19 +32,119 @@ export function Vendors() {
     },
   })
 
+  const createVendor = useMutation({
+    mutationFn: () =>
+      adminApi.createMerchant({
+        name: contactName,
+        email,
+        phone: phone || undefined,
+        store_name: storeName,
+        password,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["merchants"] })
+      setShowCreate(false)
+      setStoreName("")
+      setContactName("")
+      setEmail("")
+      setPhone("")
+      setPassword("")
+      setCreateError(null)
+    },
+    onError: (e: Error) => setCreateError(e.message),
+  })
+
   const merchants = data?.data ?? []
 
   return (
     <div className="space-y-6">
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search vendors…"
-          className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm"
-        />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search vendors…"
+            className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowCreate((v) => !v)}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        >
+          {showCreate ? "Close" : "Add vendor"}
+        </button>
       </div>
+
+      {showCreate && (
+        <form
+          className="rounded-2xl border border-border bg-card p-5 space-y-3"
+          onSubmit={(e) => {
+            e.preventDefault()
+            setCreateError(null)
+            createVendor.mutate()
+          }}
+        >
+          <h2 className="font-semibold">New vendor</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input
+              required
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              placeholder="Store name"
+              className="rounded-lg border border-border px-3 py-2 text-sm sm:col-span-2"
+            />
+            <input
+              required
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              placeholder="Contact name"
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Phone (optional)"
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+            <input
+              required
+              type="password"
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (min 8 chars)"
+              className="rounded-lg border border-border px-3 py-2 text-sm"
+            />
+          </div>
+          {createError && <p className="text-sm text-destructive">{createError}</p>}
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={createVendor.isPending}
+              className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+            >
+              {createVendor.isPending ? "Creating…" : "Create vendor"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCreate(false)}
+              className="rounded-lg border border-border px-4 py-2 text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       {isLoading ? (
         <p className="text-muted-foreground">Loading vendors…</p>
