@@ -17,16 +17,26 @@ export const adminApi = {
       body: JSON.stringify(body),
       audit: { action: "pricing.update", entity: "pricing", context: body as unknown as Record<string, unknown> },
     }),
-  merchants: (search?: string) =>
-    api<{ data: MerchantDto[] }>(`/admin/merchants${search ? `?search=${encodeURIComponent(search)}` : ""}`),
+  merchants: (search?: string, page?: number) => {
+    const q = new URLSearchParams()
+    if (search) q.set("search", search)
+    if (page) q.set("page", String(page))
+    const qs = q.toString()
+    return api<{ data: MerchantDto[]; meta?: PaginatedMeta }>(`/admin/merchants${qs ? `?${qs}` : ""}`)
+  },
   createMerchant: (body: { name: string; email: string; phone?: string; store_name: string; password: string }) =>
     api<{ data: MerchantDto }>("/admin/merchants", {
       method: "POST",
       body: JSON.stringify(body),
       audit: { action: "merchant.create", entity: "merchant", message: body.store_name, context: { ...body, password: "***" } },
     }),
-  customers: (search?: string) =>
-    api<{ data: CustomerDto[] }>(`/admin/customers${search ? `?search=${encodeURIComponent(search)}` : ""}`),
+  customers: (search?: string, page?: number) => {
+    const q = new URLSearchParams()
+    if (search) q.set("search", search)
+    if (page) q.set("page", String(page))
+    const qs = q.toString()
+    return api<{ data: CustomerDto[]; meta?: PaginatedMeta }>(`/admin/customers${qs ? `?${qs}` : ""}`)
+  },
   updateMerchantDeliveryCharge: (id: number, delivery_charge: number | null) =>
     api(`/admin/merchants/${id}/delivery-charge`, {
       method: "PUT",
@@ -109,14 +119,24 @@ export const adminApi = {
       body: JSON.stringify(body),
       audit: { action: "user.roles.update", entity: "user", entityId: userId, context: body as unknown as Record<string, unknown> },
     }),
-  orders: (params?: { status?: string; search?: string }) => {
+  orders: (params?: { status?: string; search?: string; page?: number }) => {
     const q = new URLSearchParams()
     if (params?.status) q.set("status", params.status)
     if (params?.search) q.set("search", params.search)
+    if (params?.page) q.set("page", String(params.page))
     const qs = q.toString()
-    return api<{ data: OrderDto[] }>(`/admin/orders${qs ? `?${qs}` : ""}`)
+    return api<{ data: OrderDto[]; meta?: PaginatedMeta }>(`/admin/orders${qs ? `?${qs}` : ""}`)
   },
   order: (id: number) => api<{ data: OrderDetailDto }>(`/admin/orders/${id}`),
+  assignRider: (orderId: number, riderUserId: number) =>
+    api<{ data: OrderDetailDto }>(`/admin/orders/${orderId}/assign-rider`, {
+      method: "POST",
+      body: JSON.stringify({ rider_id: riderUserId }),
+    }),
+  cancelOrder: (orderId: number) =>
+    api<{ data: OrderDetailDto }>(`/admin/orders/${orderId}/cancel`, {
+      method: "POST",
+    }),
   riderOrders: (riderId: number, params?: { status?: string; page?: number }) => {
     const q = new URLSearchParams()
     if (params?.status) q.set("status", params.status)
@@ -164,6 +184,14 @@ export const adminApi = {
   },
 }
 
+export type PaginatedMeta = {
+  page?: number
+  per_page?: number
+  total?: number
+  current_page?: number
+  last_page?: number
+}
+
 export type ActivityLogDto = {
   id: number
   action: string
@@ -208,7 +236,7 @@ export type RiderDto = {
   commission_rate?: number | null
   effective_commission_rate?: number
   documents_verified: boolean
-  user?: { name: string; email?: string; phone: string }
+  user?: { id: number; name: string; email?: string; phone: string }
   assigned_city?: string
 }
 export type WalletDto = {

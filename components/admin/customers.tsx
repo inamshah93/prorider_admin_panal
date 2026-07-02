@@ -4,13 +4,15 @@ import { useQuery } from "@tanstack/react-query"
 import { Search, UserCircle } from "lucide-react"
 import { useState } from "react"
 import { adminApi } from "@/lib/api/admin"
+import { PaginationControls } from "@/components/shared/pagination-controls"
 
 export function Customers() {
   const [query, setQuery] = useState("")
+  const [page, setPage] = useState(1)
 
   const { data, isLoading } = useQuery({
-    queryKey: ["customers", query],
-    queryFn: () => adminApi.customers(query),
+    queryKey: ["customers", query, page],
+    queryFn: () => adminApi.customers(query, page),
   })
 
   const customers = data?.data ?? []
@@ -21,7 +23,10 @@ export function Customers() {
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setPage(1)
+          }}
           placeholder="Search customers…"
           className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm"
         />
@@ -60,6 +65,7 @@ export function Customers() {
               ))}
             </tbody>
           </table>
+          <PaginationControls page={page} meta={data?.meta} isLoading={isLoading} onPageChange={setPage} />
         </div>
       )}
     </div>

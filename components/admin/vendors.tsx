@@ -5,10 +5,12 @@ import Link from "next/link"
 import { Search } from "lucide-react"
 import { useState } from "react"
 import { adminApi } from "@/lib/api/admin"
+import { PaginationControls } from "@/components/shared/pagination-controls"
 
 export function Vendors() {
   const qc = useQueryClient()
   const [query, setQuery] = useState("")
+  const [page, setPage] = useState(1)
   const [showCreate, setShowCreate] = useState(false)
   const [storeName, setStoreName] = useState("")
   const [contactName, setContactName] = useState("")
@@ -20,8 +22,8 @@ export function Vendors() {
   const [editCharge, setEditCharge] = useState("")
 
   const { data, isLoading } = useQuery({
-    queryKey: ["merchants", query],
-    queryFn: () => adminApi.merchants(query),
+    queryKey: ["merchants", query, page],
+    queryFn: () => adminApi.merchants(query, page),
   })
 
   const updateCharge = useMutation({
@@ -64,7 +66,10 @@ export function Vendors() {
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(1)
+            }}
             placeholder="Search vendors…"
             className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm"
           />
@@ -213,6 +218,7 @@ export function Vendors() {
               ))}
             </tbody>
           </table>
+          <PaginationControls page={page} meta={data?.meta} isLoading={isLoading} onPageChange={setPage} />
         </div>
       )}
     </div>

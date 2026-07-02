@@ -1,8 +1,9 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { useState } from "react"
 import { adminApi, type OrderDetailDto } from "@/lib/api/admin"
 import { StatusBadge } from "@/components/shared/status-badge"
 
@@ -68,9 +69,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
+const CANCELLABLE = new Set(["created", "ready_to_ship"])
+const TERMINAL = new Set(["delivered", "cancelled"])
+
 export function OrderDetail() {
   const params = useParams()
   const orderId = Number(params.id)
+  const qc = useQueryClient()
+  const [selectedRiderId, setSelectedRiderId] = useState<string>("")
+  const [actionError, setActionError] = useState<string | null>(null)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-order", orderId],
@@ -78,7 +85,35 @@ export function OrderDetail() {
     enabled: !!orderId,
   })
 
+  const { data: ridersData } = useQuery({
+    queryKey: ["riders"],
+    queryFn: () => adminApi.riders(),
+  })
+
+  const assignRider = useMutation({
+    mutationFn: () => adminApi.assignRider(orderId, Number(selectedRiderId)),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-order", orderId] })
+      qc.invalidateQueries({ queryKey: ["admin-orders"] })
+      setActionError(null)
+    },
+    onError: (e: Error) => setActionError(e.message),
+  })
+
+  const cancelOrder = useMutation({
+    mutationFn: () => adminApi.cancelOrder(orderId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-order", orderId] })
+      qc.invalidateQueries({ queryKey: ["admin-orders"] })
+      setActionError(null)
+    },
+    onError: (e: Error) => setActionError(e.message),
+  })
+
   const order = data?.data
+  const riders = ridersData?.data ?? []
+  const canCancel = order ? CANCELLABLE.has(order.order_status) : false
+  const canAssign = order ? !TERMINAL.has(order.order_status) : false
 
   if (isLoading) {
     return <p className="text-muted-foreground">Loading order…</p>
@@ -110,6 +145,63 @@ export function OrderDetail() {
           <StatusBadge status={order.payment_status} />
         </div>
       </div>
+
+      {(canAssign || canCancel) && (
+        <Section title="Actions">
+          <div className="space-y-4">
+            {canAssign && (
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="min-w-[220px] flex-1">
+                  <label className="text-xs font-medium text-muted-foreground">Assign rider</label>
+                  <select
+                    value={selectedRiderId}
+                    onChange={(e) => setSelectedRiderId(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="">Select rider…</option>
+                    {riders.map((r) => (
+                      <option key={r.id} value={r.user?.id ?? ""} disabled={!r.user?.id}>
+                        {r.user?.name ?? "Rider"} · {r.user?.phone ?? "—"}
+                        {r.is_online ? " (online)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  disabled={!selectedRiderId || assignRider.isPending}
+                  onClick={() => assignRider.mutate()}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  {assignRider.isPending ? "Assigning…" : order.rider ? "Reassign rider" : "Assign rider"}
+                </button>
+              </div>
+            )}
+
+            {canCancel && (
+              <div className="flex items-center gap-3 border-t border-border pt-4">
+                <p className="flex-1 text-sm text-muted-foreground">
+                  Cancel this order if it should no longer be fulfilled.
+                </p>
+                <button
+                  type="button"
+                  disabled={cancelOrder.isPending}
+                  onClick={() => {
+                    if (window.confirm(`Cancel order ${order.order_reference_number}?`)) {
+                      cancelOrder.mutate()
+                    }
+                  }}
+                  className="rounded-lg border border-destructive/40 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/5 disabled:opacity-50"
+                >
+                  {cancelOrder.isPending ? "Cancelling…" : "Cancel order"}
+                </button>
+              </div>
+            )}
+
+            {actionError && <p className="text-sm text-destructive">{actionError}</p>}
+          </div>
+        </Section>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Section title="Customer">

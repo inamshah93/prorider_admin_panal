@@ -4,18 +4,20 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { adminApi } from "@/lib/api/admin"
+import { PaginationControls } from "@/components/shared/pagination-controls"
 import { StatusBadge } from "@/components/shared/status-badge"
 
 export function OrdersPage() {
   const [status, setStatus] = useState("")
   const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
 
   const params = useMemo(() => {
-    const p: { status?: string; search?: string } = {}
+    const p: { status?: string; search?: string; page?: number } = { page }
     if (status) p.status = status
     if (search.trim()) p.search = search.trim()
     return p
-  }, [status, search])
+  }, [status, search, page])
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-orders", params],
@@ -23,6 +25,7 @@ export function OrdersPage() {
   })
 
   const orders = data?.data ?? []
+  const meta = data?.meta
 
   const filteredTotalCod = useMemo(() => {
     return orders.reduce((sum: number, o: any) => sum + (Number(o?.cod_amount) || 0), 0)
@@ -39,7 +42,10 @@ export function OrdersPage() {
         />
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => {
+            setStatus(e.target.value)
+            setPage(1)
+          }}
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
         >
           <option value="">All statuses</option>
@@ -55,6 +61,7 @@ export function OrdersPage() {
           onClick={() => {
             setSearch("")
             setStatus("")
+            setPage(1)
           }}
           className="rounded-lg border border-border px-3 py-2 text-sm"
         >
@@ -97,9 +104,10 @@ export function OrdersPage() {
           </table>
 
           <div className="flex items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm">
-            <span className="text-muted-foreground">Total (filtered)</span>
+            <span className="text-muted-foreground">Total COD (this page)</span>
             <span className="font-medium">₨ {filteredTotalCod.toLocaleString("en-PK")}</span>
           </div>
+          <PaginationControls page={page} meta={meta} isLoading={isLoading} onPageChange={setPage} />
         </div>
       )}
       </div>
