@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
 import { useState } from "react"
-import { api } from "@/lib/api/client"
+import { adminApi } from "@/lib/api/admin"
 
 type PendingOrder = {
   id: number
@@ -19,18 +19,15 @@ export function FinancePage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["pending-payments"],
-    queryFn: () => api<{ data: { data: PendingOrder[] } }>("/admin/payments/pending"),
+    queryFn: () => adminApi.pendingPayments(),
   })
 
   const override = useMutation({
     mutationFn: () =>
-      api("/admin/payments/override", {
-        method: "POST",
-        body: JSON.stringify({
-          order_id: Number(orderId),
-          new_status: "paid",
-          reason,
-        }),
+      adminApi.paymentOverride({
+        order_id: Number(orderId),
+        new_status: "paid",
+        reason,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["pending-payments"] })

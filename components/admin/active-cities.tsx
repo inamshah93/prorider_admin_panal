@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { api } from "@/lib/api/client"
+import { adminApi } from "@/lib/api/admin"
 
 type City = {
   id: number
@@ -49,10 +50,7 @@ export function ActiveCities() {
 
   const toggleCity = useMutation({
     mutationFn: (city: City) =>
-      api(`/admin/cities/${city.id}`, {
-        method: "PUT",
-        body: JSON.stringify({ is_active: !city.is_active }),
-      }),
+      adminApi.updateCity(city.id, { is_active: !city.is_active }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["cities"] }),
   })
 

@@ -17,6 +17,7 @@ import {
   X,
   Package,
   Wallet,
+  ClipboardList,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth, useRequireAuth } from "@/lib/auth/auth-context"
@@ -29,6 +30,7 @@ const NAV = [
   { href: "/orders", label: "Orders", desc: "Lifecycle & assign", icon: Package },
   { href: "/finance", label: "Finance", desc: "Payments & overrides", icon: Wallet },
   { href: "/management", label: "Management", desc: "Roles & access", icon: Users },
+  { href: "/activity-logs", label: "Activity Logs", desc: "Who did what & when", icon: ClipboardList },
   { href: "/settings/cities", label: "Settings", desc: "Cities & pricing", icon: Settings },
 ]
 
@@ -39,6 +41,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const current =
     NAV.find((n) => pathname.startsWith(n.href)) ??
     (pathname.startsWith("/riders/") ? NAV.find((n) => n.href === "/riders") : null) ??
+    (pathname.startsWith("/vendors/") ? NAV.find((n) => n.href === "/vendors") : null) ??
     (pathname.startsWith("/orders/") ? NAV.find((n) => n.href === "/orders") : null) ??
     NAV[0]
   const initials = auth.user?.name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() ?? "AO"

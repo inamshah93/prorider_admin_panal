@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import Link from "next/link"
 import { Search } from "lucide-react"
 import { useState } from "react"
 import { adminApi } from "@/lib/api/admin"
@@ -162,7 +163,11 @@ export function Vendors() {
             <tbody>
               {merchants.map((m) => (
                 <tr key={m.id} className="border-b border-border/60">
-                  <td className="px-4 py-3 font-medium">{m.store_name}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link href={`/vendors/${m.id}`} className="text-primary hover:underline">
+                      {m.store_name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{m.user?.email}</td>
                   <td className="px-4 py-3">
                     {editingId === m.id ? (
