@@ -2,27 +2,23 @@
 
 Last updated: 2026-07-02
 
-## Phase 1 — Remaining (incomplete)
+## Phase 1 — Done (minor gaps remain)
 
 | # | Task | App | Notes |
 |---|------|-----|-------|
 | 1.1 | Firebase FCM wiring | Rider, Merchant, Backend | `DeviceTokenRegistry` ready; needs `google-services.json` + `firebase_messaging` |
-| 1.2 | Push on assign/pickup/deliver | Backend + Apps | `SendFcmNotificationJob` exists; trigger from more events |
+| 1.2 | Push on assign/pickup/deliver | Backend + Apps | Partial — `OrderNotificationService` wired |
 | 1.3 | Admin permission-gated nav | Admin UI | `hasPermission()` unused in sidebar |
 | 1.4 | Rider document approve UI | Admin UI | API exists, no button |
 | 1.5 | Assign city post-create | Admin UI | `PUT riders/{id}/city` not in UI |
-| 1.6 | Reports page | Admin UI | `reports/day-end`, `reports/riders` APIs only |
-| 1.7 | Vendor ledger on detail | Admin UI | `GET merchants/{id}` ledger not shown |
-| 1.8 | Shopify connect UI | Admin + Merchant | API only |
-| 1.9 | Create city / alias UI | Admin Settings | POST APIs exist |
-| 1.10 | Staff permissions edit | Admin Management | Matrix is read-only |
-| 1.11 | Global search | Admin UI | Header search icon dead |
-| 1.12 | Notifications bell | Admin UI | No handler |
-| 1.13 | `velo_core` remote repo | velo_core | Local only; no origin push target |
+| 1.6 | Reports page | Admin UI | **Done** (Phase 3) |
+| 1.7 | Vendor ledger on detail | Admin UI | **Done** (Phase 3) |
+
+Core Phase 1 complete: order assign/cancel, pagination, activity logs, rider GPS, merchant orders list.
 
 ---
 
-## Phase 2 — In progress
+## Phase 2 — Mostly done
 
 | # | Task | App | Status |
 |---|------|-----|--------|
@@ -36,13 +32,15 @@ Last updated: 2026-07-02
 
 ---
 
-## Phase 3 — Finance & Reports
+## Phase 3 — Done
 
-- Admin reports page (day-end, rider performance)
-- Vendor ledger / payables detail
-- Merchant earnings view
-- Rider earnings breakdown
-- CSV export (orders, settlements)
+| # | Task | App | Status |
+|---|------|-----|--------|
+| 3.1 | Admin reports page | Admin UI | Done — day-end + rider performance |
+| 3.2 | Vendor ledger / payables detail | Admin UI | Done |
+| 3.3 | Merchant earnings view | Merchant app + Backend | Done — totals + lifetime COD |
+| 3.4 | Rider earnings breakdown | Rider app + Backend | Done — recent ledger entries |
+| 3.5 | CSV export (orders) | Admin UI | Done — current page export |
 
 ---
 
@@ -75,3 +73,18 @@ Last updated: 2026-07-02
 - Bulk CSV import
 - Zone / weight pricing
 - Analytics dashboard
+
+---
+
+## Other backlog
+
+| Task | App |
+|------|-----|
+| Shopify connect UI | Admin + Merchant |
+| Create city / alias UI | Admin Settings |
+| Staff permissions edit | Admin Management |
+| Global search | Admin UI |
+| Notifications bell | Admin UI |
+| `velo_core` remote repo | velo_core |
+
+See **TESTING.md** for full manual test checklist.

@@ -31,6 +31,25 @@ export function OrdersPage() {
     return orders.reduce((sum: number, o: any) => sum + (Number(o?.cod_amount) || 0), 0)
   }, [orders])
 
+  function exportCsv() {
+    const header = ["Reference", "Customer", "City", "COD", "Status"]
+    const rows = orders.map((o) => [
+      o.order_reference_number,
+      o.customer_name,
+      o.target_city ?? "",
+      String(o.cod_amount),
+      o.order_status,
+    ])
+    const csv = [header, ...rows].map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `orders-page-${page}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4">
@@ -56,6 +75,14 @@ export function OrdersPage() {
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
         </select>
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={orders.length === 0}
+          className="rounded-lg border border-border px-3 py-2 text-sm disabled:opacity-50"
+        >
+          Export CSV
+        </button>
         <button
           type="button"
           onClick={() => {

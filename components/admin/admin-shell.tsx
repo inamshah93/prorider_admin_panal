@@ -18,6 +18,7 @@ import {
   Package,
   Wallet,
   ClipboardList,
+  BarChart3,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth, useRequireAuth } from "@/lib/auth/auth-context"
@@ -29,6 +30,7 @@ const NAV = [
   { href: "/customers", label: "Customers", desc: "App users & orders", icon: UserCircle },
   { href: "/orders", label: "Orders", desc: "Lifecycle & assign", icon: Package },
   { href: "/finance", label: "Finance", desc: "Payments & overrides", icon: Wallet },
+  { href: "/reports", label: "Reports", desc: "Day-end & riders", icon: BarChart3 },
   { href: "/management", label: "Management", desc: "Roles & access", icon: Users },
   { href: "/activity-logs", label: "Activity Logs", desc: "Who did what & when", icon: ClipboardList },
   { href: "/settings/cities", label: "Settings", desc: "Cities & pricing", icon: Settings },

@@ -163,6 +163,16 @@ export const adminApi = {
     api<{ data: { total: number; delivered: number; returned: number; by_status: Record<string, number> } }>(
       `/admin/merchants/${merchantId}/orders/stats`,
     ),
+  merchant: (id: number) =>
+    api<{
+      data: MerchantDto
+      ledger: LedgerEntryDto[]
+      payables: number
+    }>(`/admin/merchants/${id}`),
+  reportsDayEnd: (limit?: number) =>
+    api<{ data: DayEndSnapshotDto[] }>(`/admin/reports/day-end${limit ? `?limit=${limit}` : ""}`),
+  reportsRiders: () =>
+    api<{ data: RiderReportDto[] }>("/admin/reports/riders"),
   pendingPayments: () => api<{ data: { data: OrderDto[] } }>("/admin/payments/pending"),
   paymentOverride: (body: { order_id: number; new_status: string; reason: string }) =>
     api("/admin/payments/override", {
@@ -203,6 +213,36 @@ export type ActivityLogDto = {
   created_at: string
   user?: { id: number; name: string; email?: string | null } | null
   context?: Record<string, unknown> | null
+}
+
+export type DayEndSnapshotDto = {
+  id: number
+  snapshot_date: string
+  total_cod_collected: string | number
+  total_rider_cash: string | number
+  total_merchant_payables: string | number
+  platform_net_profit: string | number
+  orders_delivered: number
+}
+
+export type RiderReportDto = {
+  id: number
+  name: string
+  phone?: string
+  is_online: boolean
+  cash_in_hand: number
+  total_collected: number
+  total_commission_earned: number
+  total_settled: number
+}
+
+export type LedgerEntryDto = {
+  id: number
+  entry_type: string
+  amount: string | number
+  reference?: string | null
+  notes?: string | null
+  created_at?: string
 }
 
 export type PricingDto = {
