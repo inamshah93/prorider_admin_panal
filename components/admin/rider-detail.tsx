@@ -18,6 +18,38 @@ export function RiderDetail() {
   const [commissionPercent, setCommissionPercent] = useState("")
   const [ordersStatus, setOrdersStatus] = useState<string>("")
   const [ordersPage, setOrdersPage] = useState(1)
+  const [cityId, setCityId] = useState("")
+
+  const ridersList = useQuery({
+    queryKey: ["riders"],
+    queryFn: () => adminApi.riders(),
+  })
+
+  const cities = useQuery({
+    queryKey: ["cities"],
+    queryFn: () => adminApi.cities(),
+  })
+
+  const riderProfile = ridersList.data?.data?.find((r) => r.id === riderId)
+
+  const documents = useQuery({
+    queryKey: ["rider-documents", riderId],
+    queryFn: () => adminApi.riderDocuments(riderId),
+    enabled: !!riderId,
+  })
+
+  const approve = useMutation({
+    mutationFn: () => adminApi.approveRider(riderId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["riders"] })
+      qc.invalidateQueries({ queryKey: ["rider-documents", riderId] })
+    },
+  })
+
+  const assignCity = useMutation({
+    mutationFn: () => adminApi.assignRiderCity(riderId, Number(cityId)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["riders"] }),
+  })
 
   const wallet = useQuery({
     queryKey: ["rider-wallet", riderId],
@@ -79,6 +111,79 @@ export function RiderDetail() {
       <Link href="/riders" className="text-sm text-primary hover:underline">
         ← Back to riders
       </Link>
+
+      {riderProfile && (
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-bold">{riderProfile.user?.name ?? "Rider"}</h1>
+              <p className="text-sm text-muted-foreground">
+                {riderProfile.user?.phone} · {riderProfile.assigned_city ?? "No city assigned"}
+              </p>
+              <p className="mt-1 text-sm">
+                Documents:{" "}
+                <span className={riderProfile.documents_verified ? "text-green-600" : "text-orange-600"}>
+                  {riderProfile.documents_verified ? "Verified" : "Pending verification"}
+                </span>
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {!riderProfile.documents_verified && (
+                <button
+                  type="button"
+                  onClick={() => approve.mutate()}
+                  disabled={approve.isPending}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  {approve.isPending ? "Approving…" : "Approve documents"}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-border pt-4">
+            <div className="min-w-[200px]">
+              <label className="text-xs font-medium text-muted-foreground">Assign city</label>
+              <select
+                value={cityId || String((cities.data?.data ?? []).find((c) => c.name === riderProfile.assigned_city)?.id ?? "")}
+                onChange={(e) => setCityId(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Select city…</option>
+                {(cities.data?.data ?? []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="button"
+              disabled={!cityId || assignCity.isPending}
+              onClick={() => assignCity.mutate()}
+              className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-50"
+            >
+              Save city
+            </button>
+          </div>
+
+          {(documents.data?.data ?? []).length > 0 && (
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="font-medium">Uploaded documents</h3>
+              <ul className="mt-2 space-y-2 text-sm">
+                {(documents.data?.data ?? []).map((d) => (
+                  <li key={d.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                    <span className="capitalize">{d.document_type.replace(/_/g, " ")}</span>
+                    <a href={d.file_url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                      View · {d.status}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {wallet.isLoading ? (
         <p className="text-muted-foreground">Loading wallet…</p>

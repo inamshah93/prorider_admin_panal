@@ -242,9 +242,35 @@ export function OrderDetail() {
             />
             <DetailRow label="AWB" value={order.awb_number} />
             <DetailRow label="Prep status" value={order.merchant_prep_status?.replace(/_/g, " ")} />
+            {order.failure_reason && (
+              <DetailRow label="Failure reason" value={order.failure_reason} />
+            )}
           </dl>
         </Section>
       </div>
+
+      {(order.pod_photo_path || order.signature_path) && (
+        <Section title="Proof of delivery">
+          <div className="flex flex-wrap gap-4">
+            {order.pod_photo_path && (
+              <div>
+                <p className="mb-2 text-sm text-muted-foreground">Delivery photo</p>
+                <a href={order.pod_photo_path} target="_blank" rel="noreferrer">
+                  <img src={order.pod_photo_path} alt="POD" className="max-h-48 rounded-lg border border-border" />
+                </a>
+              </div>
+            )}
+            {order.signature_path && (
+              <div>
+                <p className="mb-2 text-sm text-muted-foreground">Signature</p>
+                <a href={order.signature_path} target="_blank" rel="noreferrer">
+                  <img src={order.signature_path} alt="Signature" className="max-h-48 rounded-lg border border-border" />
+                </a>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
 
       <Section title="Order items">
         <ItemList items={order.item_details} />

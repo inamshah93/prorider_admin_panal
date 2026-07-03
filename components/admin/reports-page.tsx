@@ -19,11 +19,33 @@ export function ReportsPage() {
     queryFn: () => adminApi.reportsRiders(),
   })
 
+  const analytics = useQuery({
+    queryKey: ["reports-analytics"],
+    queryFn: () => adminApi.reportsAnalytics(),
+  })
+
   const snapshots = dayEnd.data?.data ?? []
   const riderRows = riders.data?.data ?? []
+  const a = analytics.data?.data
 
   return (
     <div className="space-y-6">
+      {a && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Delivered today", value: a.delivered_today },
+            { label: "Failed (7d)", value: a.failed_last_7_days },
+            { label: "Returned RTO (7d)", value: a.returned_last_7_days },
+            { label: "Avg rating", value: a.average_delivery_rating ?? "—" },
+          ].map((item) => (
+            <div key={item.label} className="rounded-2xl border border-border bg-card p-4">
+              <p className="text-sm text-muted-foreground">{item.label}</p>
+              <p className="mt-1 text-2xl font-bold">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border bg-card p-5">
         <h2 className="font-semibold">Day-end snapshots (last 14 days)</h2>
         <p className="mt-1 text-sm text-muted-foreground">COD collected, rider cash, payables, and net profit per day.</p>

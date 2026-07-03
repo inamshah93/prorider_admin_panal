@@ -76,6 +76,18 @@ export const adminApi = {
     }),
   approveRider: (id: number) =>
     api(`/admin/riders/${id}/approve`, { method: "POST", audit: { action: "rider.approve", entity: "rider", entityId: id } }),
+  assignRiderCity: (id: number, assigned_city_id: number) =>
+    api<{ data: RiderDto }>(`/admin/riders/${id}/city`, {
+      method: "PUT",
+      body: JSON.stringify({ assigned_city_id }),
+      audit: { action: "rider.city.assign", entity: "rider", entityId: id, context: { assigned_city_id } },
+    }),
+  ridersMap: () =>
+    api<{ data: RiderMapDto[] }>("/admin/riders/map"),
+  riderDocuments: (id: number) =>
+    api<{ data: RiderDocumentDto[] }>(`/admin/riders/${id}/documents`),
+  reportsAnalytics: () =>
+    api<{ data: AnalyticsDto }>("/admin/reports/analytics"),
   riderWallet: (id: number) => api<{ data: WalletDto }>(`/admin/riders/${id}/wallet`),
   riderSettlements: (id: number) => api<{ data: SettlementDto[] }>(`/admin/riders/${id}/settlements`),
   recordRiderSettlement: (id: number, form: FormData) =>
@@ -250,7 +262,15 @@ export type PricingDto = {
   default_rider_commission_rate: number
   default_rider_commission_percent: number
 }
-export type CityDto = { id: number; name: string; province: string; is_active: boolean; aliases?: string[] }
+export type CityDto = {
+  id: number
+  name: string
+  province: string
+  is_active: boolean
+  delivery_surcharge?: number
+  weight_rate_per_kg?: number
+  aliases?: string[]
+}
 export type MerchantDto = {
   id: number
   store_name: string
@@ -329,6 +349,11 @@ export type OrderDetailDto = OrderDto & {
   payment_method?: string
   merchant_prep_status?: string
   awb_number?: string | null
+  assignment_status?: string | null
+  pod_photo_path?: string | null
+  signature_path?: string | null
+  failure_reason?: string | null
+  failed_at?: string | null
   rider?: { id: number; name: string; phone?: string } | null
   events?: Array<{
     id: number
@@ -340,4 +365,32 @@ export type OrderDetailDto = OrderDto & {
   }>
   created_at?: string
   updated_at?: string
+}
+
+export type RiderMapDto = {
+  id: number
+  user_id: number
+  name?: string
+  phone?: string
+  city?: string
+  lat: number
+  lng: number
+  cash_in_hand: number
+}
+
+export type RiderDocumentDto = {
+  id: number
+  document_type: string
+  file_url: string
+  status: string
+  rejection_reason?: string | null
+  created_at?: string
+}
+
+export type AnalyticsDto = {
+  orders_by_status: Record<string, number>
+  delivered_today: number
+  failed_last_7_days: number
+  returned_last_7_days: number
+  average_delivery_rating: number | null
 }

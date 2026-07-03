@@ -27,6 +27,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", desc: "Real-time operations", icon: LayoutDashboard },
   { href: "/vendors", label: "Vendors", desc: "Stores & ledgers", icon: Store },
   { href: "/riders", label: "Riders", desc: "Fleet & cash", icon: Bike },
+  { href: "/riders/map", label: "Live map", desc: "Online riders GPS", icon: Truck },
   { href: "/customers", label: "Customers", desc: "App users & orders", icon: UserCircle },
   { href: "/orders", label: "Orders", desc: "Lifecycle & assign", icon: Package },
   { href: "/finance", label: "Finance", desc: "Payments & overrides", icon: Wallet },
@@ -42,7 +43,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const current =
     NAV.find((n) => pathname.startsWith(n.href)) ??
-    (pathname.startsWith("/riders/") ? NAV.find((n) => n.href === "/riders") : null) ??
+    (pathname.startsWith("/riders/") ? NAV.find((n) => n.href === "/riders" || n.href === "/riders/map") : null) ??
     (pathname.startsWith("/vendors/") ? NAV.find((n) => n.href === "/vendors") : null) ??
     (pathname.startsWith("/orders/") ? NAV.find((n) => n.href === "/orders") : null) ??
     NAV[0]

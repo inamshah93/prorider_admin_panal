@@ -1,192 +1,155 @@
-# Velo Platform — Testing Checklist
+# Velo Platform — Complete Testing Checklist
 
-Use this while testing all apps. Backend should run at `http://localhost:8000` and admin at `http://localhost:3000`.
-
----
-
-## Setup (once)
-
-- [ ] Backend: `php artisan serve` (port 8000)
-- [ ] Admin UI: `npm run dev` (port 3000)
-- [ ] `.env.local` has `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`
-- [ ] Test accounts: admin, merchant, rider, customer (or create via admin)
+Test after running backend (`php artisan serve`) and admin (`npm run dev`). Mobile apps point to `http://10.0.2.2:8000/api/v1` (Android emulator) or your machine IP.
 
 ---
 
-## 1. Admin Portal (`prorider_UI`)
+## Setup
 
-### Auth & shell
-- [ ] Login with admin credentials
-- [ ] Dashboard loads without 500 errors
-- [ ] Sidebar navigation works (all menu items)
-- [ ] Logout works
-
-### Dashboard
-- [ ] Metrics cards show numbers
-- [ ] Recent activity list loads
-- [ ] Chart renders (if data exists)
-
-### Orders
-- [ ] Orders list loads with pagination
-- [ ] Search by reference / customer name works
-- [ ] Status filter works (created, dispatched, delivered, etc.)
-- [ ] COD total for current page is correct
-- [ ] **Export CSV** downloads file for current page
-- [ ] Click order → detail page opens
-
-### Order detail
-- [ ] Order info, customer, COD, status display correctly
-- [ ] **Assign rider** — pick online rider, confirm assignment
-- [ ] **Reassign rider** — change to another rider
-- [ ] **Cancel order** — confirm cancellation, status updates
-- [ ] Activity reflects in Activity Logs (assign / cancel)
-
-### Vendors (Merchants)
-- [ ] List loads with search + pagination
-- [ ] Create new merchant works
-- [ ] Vendor detail page shows store info
-- [ ] **Payables** amount visible on detail
-- [ ] **Financial ledger** table shows entries
-- [ ] Merchant orders list + status filter on detail page
-
-### Riders
-- [ ] Riders list loads
-- [ ] Toggle online/offline status
-- [ ] Rider detail: wallet, settlements
-- [ ] Create rider, approve rider (if pending)
-
-### Customers
-- [ ] List loads with search + pagination
-
-### Finance
-- [ ] Pending payments list loads
-- [ ] Payment override (if applicable) works with reason
-
-### Reports (Phase 3)
-- [ ] **Reports** nav opens `/reports`
-- [ ] Day-end snapshots table loads (or empty state message)
-- [ ] Rider performance table loads
-- [ ] Rider name links to `/riders/[id]` correctly
-
-### Activity logs
-- [ ] Logs list loads with pagination
-- [ ] Search / filter by action works
-- [ ] Assign & cancel actions appear after testing orders
-
-### Settings
-- [ ] Cities list loads, toggle active city
-- [ ] Pricing settings load and save
+- [ ] Backend migrations run: `php artisan migrate`
+- [ ] Admin `.env.local`: `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`
+- [ ] Test accounts: admin, merchant, rider, customer
 
 ---
 
-## 2. Backend API (optional curl / Postman)
+## Phase 1 — Core ops
 
-- [ ] `GET /api/v1/admin/dashboard` — 200
-- [ ] `GET /api/v1/admin/activity-logs` — 200
-- [ ] `GET /api/v1/admin/reports/day-end` — 200
-- [ ] `GET /api/v1/admin/reports/riders` — 200
-- [ ] `GET /api/v1/admin/merchants/{id}` — includes `ledger` + `payables`
-- [ ] Assign rider creates audit log entry
-- [ ] Cancel order creates audit log entry
+### Admin
+- [ ] Login / logout
+- [ ] Dashboard loads
+- [ ] Orders: search, filter, pagination, COD total, **Export CSV**
+- [ ] Order detail: **assign rider**, **reassign**, **cancel**
+- [ ] Vendors: pagination, detail with **payables + ledger**
+- [ ] Riders / customers pagination
+- [ ] Activity logs after assign/cancel
+- [ ] Finance: pending payments
+- [ ] Settings: cities, pricing
 
----
+### Rider app
+- [ ] Login, **go online** → GPS permission
+- [ ] Location updates while online
 
-## 3. Rider App (`prorider_rider_app`)
-
-### Auth & profile
-- [ ] Login with rider credentials
-- [ ] Profile / home loads
-
-### Online & GPS (Phase 1)
-- [ ] Toggle **Go online** — location permission prompt (Android)
-- [ ] While online, location updates sent (~every 30s)
-- [ ] Toggle offline stops tracking
-
-### Orders
-- [ ] Assigned orders appear in list
-- [ ] Open order detail
-- [ ] **Navigate** button opens Google Maps (Phase 2)
-- [ ] Mark **picked up** — status updates
-- [ ] Mark **delivered** — COD collected, status updates
-
-### Wallet (Phase 3)
-- [ ] Wallet screen shows cash in hand, collected, commission, settled
-- [ ] Commission rate displayed
-- [ ] **Earnings breakdown** — recent ledger entries list
-
-### Push (if Firebase configured)
-- [ ] Device token registered after login
-- [ ] Notification on new assignment (needs FCM setup)
+### Merchant app
+- [ ] Dashboard, **orders list** (search/filter/pagination)
+- [ ] Book order flow
 
 ---
 
-## 4. Merchant App (`prorider_merchant_app`)
+## Phase 2 — Tracking
 
-### Auth & dashboard
-- [ ] Login with merchant credentials
-- [ ] Dashboard shows delivered today + payables
-- [ ] **Total orders** and **Delivered (all time)** cards (Phase 3)
-- [ ] **Lifetime COD delivered** card (Phase 3)
-- [ ] Recent orders list on dashboard
+### Customer app
+- [ ] Guest track: reference + optional phone
+- [ ] **Live map** (store + rider pins)
+- [ ] **ETA** minutes
 
-### Orders (Phase 1)
-- [ ] **Orders** tab — full list with search / filter / pagination
-- [ ] "View all" from dashboard navigates to orders
-- [ ] Order detail shows correct status
+### Rider app
+- [ ] **Navigate** opens Google Maps
 
-### Book order
-- [ ] Create new order (book flow)
-- [ ] Label → pack → ship lifecycle (if implemented)
+### Admin
+- [ ] **Live map** (`/riders/map`) — online riders with GPS
 
-### Push (if Firebase configured)
-- [ ] Token sync after login
+### Push (optional — needs Firebase files)
+- [ ] Device token sync after login
 
 ---
 
-## 5. Customer App (`prorider_customer_app`)
+## Phase 3 — Finance & reports
 
-### Guest tracking (Phase 2)
-- [ ] Track screen: enter order reference
-- [ ] Optional phone field for verification
-- [ ] Timeline / status steps display
-- [ ] **Live map** shows store + rider pins (when dispatched)
-- [ ] **ETA minutes** shown when rider location available
+### Admin
+- [ ] **Reports** page: day-end snapshots
+- [ ] Rider performance table
+- [ ] **Analytics** cards (delivered today, failed, RTO, avg rating)
 
-### Account (if logged in)
-- [ ] Login / register
-- [ ] Order history loads
+### Merchant app
+- [ ] Dashboard: total orders, delivered all-time, **lifetime COD**
 
-### Push (if Firebase configured)
-- [ ] Token registered on login
+### Rider app
+- [ ] Wallet: **earnings breakdown** (recent ledger entries)
 
 ---
 
-## 6. End-to-end flow (recommended)
+## Phase 4 — Rider & merchant complete
 
-1. [ ] Admin creates merchant + rider (or use existing)
-2. [ ] Merchant books order → status `created` / `ready_to_ship`
-3. [ ] Merchant ships order → `dispatched`
-4. [ ] Admin assigns rider (or auto-assign if configured)
-5. [ ] Rider sees assignment → navigates → picks up → delivers
-6. [ ] Customer tracks on map with ETA
-7. [ ] Admin: order `delivered`, finance/reports update
-8. [ ] Rider wallet shows commission entry
-9. [ ] Merchant dashboard payables / lifetime COD update
-10. [ ] Admin activity log shows assign/cancel events
+### Rider app
+- [ ] **Accept / reject** assignment (when admin assigns rider)
+- [ ] Pickup only works after accept
+- [ ] **Failed delivery** with reason
+- [ ] **POD photo** on deliver (optional camera)
+- [ ] **KYC upload** (`Profile → Documents`)
 
----
+### Admin
+- [ ] Rider detail: **Approve documents**
+- [ ] Rider detail: **Assign city**
+- [ ] Rider detail: view uploaded documents
+- [ ] Order detail: **POD photo / signature** after delivery
 
-## Known limitations (not bugs)
-
-| Item | Status |
-|------|--------|
-| Firebase FCM push | Needs `google-services.json` in mobile apps |
-| Admin live rider map | Phase 2.5 — not built yet |
-| CSV export | Current **page only**, not full dataset |
-| velo_core package | Local only, no remote repo |
+### Merchant app
+- [ ] **Catalog** tab: add/edit/remove items, save
+- [ ] Lifecycle: generate label → **Share / print label**
 
 ---
 
-## Report issues
+## Phase 5 — Customer polish
 
-Note: app name, screen, steps, expected vs actual, screenshot if possible.
+### Customer app
+- [ ] Track screen: **Call rider** (when out for delivery)
+- [ ] Track screen: **Sign up CTA** to link order by phone
+- [ ] Account: **order history filters** (all/delivered/in transit/cancelled)
+- [ ] Login → orders linked by phone appear
+
+### Web portal
+- [ ] Open `http://localhost:3000/track/PR-XXXXXXXX?phone=0300...`
+- [ ] Status + milestones display (no login)
+
+---
+
+## Phase 6 — Scale (partial)
+
+### Backend / pricing
+- [ ] New order in city with **delivery_surcharge** / **weight_rate_per_kg** → delivery charge includes extras
+- [ ] Update city pricing in admin (API: `PUT /admin/cities/{id}`)
+
+### RTO flow
+- [ ] Rider marks **failed delivery**
+- [ ] Rider marks **returned** (RTO) from failed state
+- [ ] Admin reports: failed/returned counts in analytics
+
+### Bulk orders (API)
+- [ ] `POST /merchant/orders/bulk` with array of orders (Postman)
+
+### SMS
+- [ ] Check `storage/logs/laravel.log` for `[SMS stub]` on deliver/fail (real SMS needs provider config)
+
+---
+
+## End-to-end flow (recommended)
+
+1. [ ] Merchant adds catalog items → books order → label → pack → ready to ship
+2. [ ] Admin assigns rider
+3. [ ] Rider **accepts** → navigates → picks up → delivers (with photo)
+4. [ ] Customer tracks on map, calls rider if needed
+5. [ ] Customer signs up → order appears in history
+6. [ ] Admin: reports, activity log, POD on order detail
+7. [ ] Rider wallet + merchant dashboard update
+
+### Failure path
+1. [ ] Rider **failed delivery** → customer sees update
+2. [ ] Rider **returned (RTO)** → merchant notified
+
+---
+
+## Known limitations
+
+| Item | Notes |
+|------|-------|
+| Firebase push | Add `google-services.json` + `firebase_messaging` to each app |
+| CSV export | Current page only |
+| Rating UI | Customer must sign in; rate via `POST /customer/orders/{id}/rate` |
+| Merchant web dashboard | Mockup only, not API-backed |
+| Admin bulk import | API for merchant bulk only; no admin UI yet |
+
+---
+
+## Report bugs
+
+Note: app, screen, steps, expected vs actual, screenshot if possible.
