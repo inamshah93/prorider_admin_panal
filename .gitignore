@@ -13,3 +13,9 @@ __v0_jsx-dev-runtime.ts
 node_modules
 .next/
 .DS_Store
+
+# cPanel / production server (do not commit from live)
+stderr.log
+stdout.log
+tmp/
+.htaccess
