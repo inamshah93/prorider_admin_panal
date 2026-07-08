@@ -20,6 +20,7 @@ import {
   ClipboardList,
   BarChart3,
 } from "lucide-react"
+import { ProRiderLogo } from "@/components/shared/prorider-logo"
 import { cn } from "@/lib/utils"
 import { useAuth, useRequireAuth } from "@/lib/auth/auth-context"
 
@@ -68,11 +69,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center gap-3 px-6 py-6">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
-            <Truck className="size-5" />
-          </div>
+          <ProRiderLogo size={40} className="rounded-xl" />
           <div>
-            <p className="text-base font-semibold tracking-tight">Velo</p>
+            <p className="text-base font-semibold tracking-tight">ProRider</p>
             <p className="text-xs text-sidebar-foreground/60">Admin Web Portal</p>
           </div>
         </div>

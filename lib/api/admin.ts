@@ -84,6 +84,16 @@ export const adminApi = {
     }),
   ridersMap: () =>
     api<{ data: RiderMapDto[] }>("/admin/riders/map"),
+  riderLocationHistory: (id: number, params: { from: string; to: string }) => {
+    const q = new URLSearchParams({ from: params.from, to: params.to })
+    return api<{ data: RiderLocationPingDto[]; meta?: { from: string; to: string; count: number } }>(
+      `/admin/riders/${id}/location-history?${q.toString()}`,
+    )
+  },
+  riderRouteReport: (id: number, params: { from: string; to: string }) => {
+    const q = new URLSearchParams({ from: params.from, to: params.to })
+    return api<{ data: RiderRouteReportDto; meta?: { from: string; to: string } }>(`/admin/riders/${id}/route-report?${q.toString()}`)
+  },
   riderDocuments: (id: number) =>
     api<{ data: RiderDocumentDto[] }>(`/admin/riders/${id}/documents`),
   reportsAnalytics: () =>
@@ -225,6 +235,23 @@ export type ActivityLogDto = {
   created_at: string
   user?: { id: number; name: string; email?: string | null } | null
   context?: Record<string, unknown> | null
+}
+
+export type RiderLocationPingDto = {
+  recorded_at: string | null
+  lat: number
+  lng: number
+  accuracy_m?: number | null
+  speed_mps?: number | null
+  heading_deg?: number | null
+}
+
+export type RiderRouteReportDto = {
+  total_distance_km: number
+  ping_count: number
+  active_duration_minutes: number
+  stops: { lat: number; lng: number; arrived_at: string; left_at: string; duration_minutes: number }[]
+  timeline: { recorded_at: string; lat: number; lng: number; speed_mps?: number | null; accuracy_m?: number | null }[]
 }
 
 export type DayEndSnapshotDto = {

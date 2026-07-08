@@ -14,15 +14,15 @@ type ApiOptions = RequestInit & {
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null
-  return localStorage.getItem("velo_token")
+  return localStorage.getItem("prorider_token")
 }
 
 export function setToken(token: string) {
-  localStorage.setItem("velo_token", token)
+  localStorage.setItem("prorider_token", token)
 }
 
 export function clearToken() {
-  localStorage.removeItem("velo_token")
+  localStorage.removeItem("prorider_token")
 }
 
 export class ApiError extends Error {

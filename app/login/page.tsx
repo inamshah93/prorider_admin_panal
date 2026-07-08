@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Truck } from "lucide-react"
+import { ProRiderLogo } from "@/components/shared/prorider-logo"
 import { useAuth } from "@/lib/auth/auth-context"
 
 export default function LoginPage() {
@@ -28,11 +28,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-sm">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Truck className="size-5" />
-          </div>
+          <ProRiderLogo size={40} className="rounded-xl" />
           <div>
-            <h1 className="text-xl font-semibold">Velo Admin</h1>
+            <h1 className="text-xl font-semibold">ProRider Admin</h1>
             <p className="text-sm text-muted-foreground">Sign in to continue</p>
           </div>
         </div>

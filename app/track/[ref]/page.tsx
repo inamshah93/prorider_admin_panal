@@ -46,7 +46,7 @@ export default function PublicTrackPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-lg bg-background p-6">
-      <h1 className="text-2xl font-bold">Velo Tracking</h1>
+      <h1 className="text-2xl font-bold">ProRider Tracking</h1>
       <p className="mt-1 text-sm text-muted-foreground">{String(data.order_reference)}</p>
       <p className="mt-4 text-lg font-medium capitalize">{String(data.order_status ?? "").replace(/_/g, " ")}</p>
       {data.eta_minutes != null && (

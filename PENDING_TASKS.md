@@ -1,4 +1,4 @@
-# Velo Platform — Pending Tasks
+# ProRider Platform — Pending Tasks
 
 Last updated: 2026-07-02
 

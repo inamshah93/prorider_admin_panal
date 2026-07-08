@@ -1,4 +1,4 @@
-# Velo Platform — Complete Testing Checklist
+# ProRider Platform — Complete Testing Checklist
 
 Test after running backend (`php artisan serve`) and admin (`npm run dev`). Mobile apps point to `http://10.0.2.2:8000/api/v1` (Android emulator) or your machine IP.
 

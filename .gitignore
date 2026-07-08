@@ -19,3 +19,4 @@ stderr.log
 stdout.log
 tmp/
 .htaccess
+next-build.tar.gz

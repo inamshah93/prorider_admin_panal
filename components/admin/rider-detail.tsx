@@ -112,6 +112,15 @@ export function RiderDetail() {
         ← Back to riders
       </Link>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href={`/riders/${riderId}/route-history`}
+          className="rounded-lg border border-border bg-background px-3 py-2 text-sm hover:bg-accent"
+        >
+          View route history
+        </Link>
+      </div>
+
       {riderProfile && (
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
